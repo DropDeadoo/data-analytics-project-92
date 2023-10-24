@@ -11,7 +11,7 @@ from customers;
 with total_sales as (
 	 		select s.sales_person_id,
 	 		count(s.sales_person_id) as operations,
-	 		round(sum(p.price * s.quantity), 0) as income
+	 		round(sum(p.price * s.quantity)) as income
 	 		from sales s
 	 		join products p 
 	 		on s.product_id = p.product_id
