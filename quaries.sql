@@ -24,23 +24,8 @@ from employees e
 join total_sales ts 
 on e.employee_id  = ts.sales_person_id
 order by 3 desc
+limit 10
 ;
-
-select      
-			concat(e.first_name, ' ', e.last_name) as name, 
-	 		count(s.sales_person_id) as operations,
-	 		p.price,
-	 		s.quantity,
-	 		sum (p.price * s.quantity) as total,
-	 		round(sum (p.price * s.quantity)) as total_round
-	 		from sales s
-	 		join products p 
-	 		on s.product_id = p.product_id
-	 		join employees e
-	 		on s.sales_person_id = e.employee_id 
-	 		group by 1, 3, 4;
-
-
 
 /* Запрос находит информацию о продавцах, чья средняя выручка за сделку меньше средней выручки за сделку по всем продавцам.
  	- name — имя и фамилия продавца
@@ -73,7 +58,7 @@ order by 2;
 /* Создаем вспомогательную таблицу ФИО продавцов, названием дня недели, номером дня недели и суммой продаж, сортируем по номер дня недели*/
 with total_sales as (
 	 		select concat(e.first_name, ' ', e.last_name) as name, 
-	 		to_char(s.sale_date, 'Day') as weekday,
+	 		to_char(s.sale_date, 'day') as weekday,
 	 		to_char(s.sale_date, 'ID') num_of_day,
 	 		round(sum(p.price * s.quantity)) as income
 	 		from sales s
