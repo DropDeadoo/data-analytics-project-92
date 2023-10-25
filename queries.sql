@@ -91,7 +91,7 @@ order by 1
 */
 select to_char(s.sale_date, 'YYYY-MM') as date,
 	   count(distinct(customer_id)) as total_customers,
-	   round(sum(s.quantity * p.price)) as income
+	   floor(sum(s.quantity * p.price)) as income
 from sales s
 join products p 
 on s.product_id = p.product_id
