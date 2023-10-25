@@ -103,16 +103,34 @@ order by 1;
  * sale_date - дата покупки
  * seller - имя и фамилия продавца
 */
-select concat(c.first_name, ' ', c.last_name) as customer, 
-min(s.sale_date) as date,
-concat(e.first_name, ' ', e.last_name) as seller
-from sales s
-join products p
-on s.product_id = p.product_id
-join customers c
-on s.customer_id = c.customer_id
-join employees e
-on s.sales_person_id = e.employee_id
-where p.price = 0
-group by 1, 3
-order by 1;
+/*Создаем вспомогательную таблицу с ФИО покупателей их первой датой покупки и самой дешёвой покупкой (= 0)*/
+with purchases as ( 
+					select concat(c.first_name, ' ', c.last_name) as customer,  
+						   min(s.sale_date) as sale_date,
+						   sum(p.price * s.quantity)
+					from sales s
+					join customers c
+					on s.customer_id = c.customer_id
+					join products p 
+					on s.product_id = p.product_id
+					group by 1
+					having sum(p.price * s.quantity) = 0
+					),
+customers_and_sellers as ( /*Создаем вспомогательную таблицу с ФИО покупателей и продавцов, а так же датами первых сделок.*/
+					select concat(c.first_name, ' ', c.last_name) as customer,  
+					       min(s.sale_date) as sale_date,
+					       concat(e.first_name, ' ', e.last_name) as seller
+					from sales s
+					join customers c 
+					on s.customer_id = c.customer_id
+					join employees e 
+					on s.sales_person_id = e.employee_id
+					group by 1, 3
+				 	)
+/* Соединяем вспомогательные таблицы между собой так, чтобы в итоговую таблицу были включены только те имена покупателей и даты их первых акционных покупок, которые = 0 и подтягиваем ФИО продавцов*/
+select p.customer, p.sale_date, cas.seller
+from purchases p
+inner join customers_and_sellers cas
+on p.customer = cas.customer and p.sale_date = cas.sale_date 
+order by 1
+;
