@@ -89,20 +89,12 @@ order by 1
  * total_customers - количество покупателей
  * income - принесенная выручка
 */
-/* Создаем вспомогательную таблицу с датой формата ГОД-МЕСЯЦ, кол-вом покупателей и выручкой в разрезе дат*/
-with income as (
-				select to_char(s.sale_date, 'YYYY-MM') as date,
-				count(s.*) as total_customers,
-				s.quantity * p.price as income
-				from sales s
-				join products p 
-				on s.product_id = p.product_id 
-				group by 1, 3
-				)
-/* Достаем из таблицы выше информацию и суммируем полученные значения в разрезе каждого месяца и года.*/
-select date, sum(total_customers) as total_customers,
-round(sum(income)) as income
-from income
+select to_char(s.sale_date, 'YYYY-MM') as date,
+	   count(distinct(customer_id)) as total_customers,
+	   round(sum(s.quantity * p.price)) as income
+from sales s
+join products p 
+on s.product_id = p.product_id
 group by 1
 order by 1;
 
